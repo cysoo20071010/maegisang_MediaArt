@@ -1,52 +1,84 @@
-// 기본 Three.js 세팅
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Live2D 불러오기
+const { Live2DModel } = PIXI.live2d;
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("canvas-container").appendChild(renderer.domElement);
-
-// 카메라 위치
-camera.position.set(0, 1.5, 3);
-
-// 조명
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(1, 3, 2);
-scene.add(light);
-
-// glTF 로더
-const loader = new THREE.GLTFLoader();
-let character;
-
-loader.load("./models/character.gltf", (gltf) => {
-  character = gltf.scene;
-  scene.add(character);
+// PIXI 앱 생성
+const app = new PIXI.Application({
+    view: document.getElementById("live2dCanvas"),
+    autoStart: true,
+    transparent: true,
+    width: 600,
+    height: 800
 });
 
-// 렌더링 루프
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-}
-animate();
+let model;
+
+// Live2D 모델 로드
+(async () => {
+    model = await Live2DModel.from("../models/长离带水印/长离带水印模型/长离.model3.json");
+
+    model.scale.set(0.4, 0.4);
+    model.position.set(200, 450);
+
+    app.stage.addChild(model);
+})();
+
+// 채팅 UI
+document.getElementById("sendBtn").onclick = sendMessage;
 
 async function sendMessage() {
-  const input = document.getElementById("userInput");
-  const chatBox = document.getElementById("chat");
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
 
-  const text = input.value;
-  input.value = "";
+    input.value = "";
 
-  chatBox.innerHTML += `<div class='msg user'>${text}</div>`;
+    addMessage(text, "user");
 
-  const res = await fetch("https://YOUR-SERVER-DOMAIN/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
+    const res = await fetch("https://YOUR-BACKEND-DOMAIN/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+    });
 
-  const data = await res.json();
-  chatBox.innerHTML += `<div class='msg bot'>${data.reply}</div>`;
+    const data = await res.json();
+
+    let bot = data.reply;
+
+    try {
+        bot = JSON.parse(bot);
+    } catch (e) {
+        bot = { text: data.reply, emotion: "neutral" };
+    }
+
+    // 메시지 표시
+    addMessage(bot.text, "bot");
+
+    // 감정 따라 Live2D 모션 실행
+    playEmotion(bot.emotion);
 }
 
-document.getElementById("sendBtn").onclick = sendMessage;
+function addMessage(text, who) {
+    const log = document.getElementById("chatLog");
+    const div = document.createElement("div");
+    div.className = who === "user" ? "msg-user" : "msg-bot";
+    div.innerText = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+}
+
+// Live2D 감정 모션 실행
+function playEmotion(emotion) {
+    if (!model) return;
+
+    const motions = {
+        happy: "EXP3/脸红.exp3.json",
+        angry: "EXP3/生气.exp3.json",
+        shy: "EXP3/爱心眼.exp3.json",
+        sad: "EXP3/黑脸.exp3.json",
+        neutral: "EXP3/白眼.exp3.json"
+    };
+
+    const motionFile = motions[emotion] || motions["neutral"];
+
+    model.motion(motionFile);
+}
