@@ -1,36 +1,20 @@
-// PIXI + Live2D
 const { Live2DModel } = PIXI.live2d;
 
-// PIXI 앱 생성
 const app = new PIXI.Application({
     view: document.getElementById("live2dCanvas"),
     autoStart: true,
-    backgroundAlpha: 0,
-    resizeTo: window
+    backgroundAlpha: 0
 });
 
-let model;
-
-// Live2D 모델 로드
 (async () => {
-    try {
-        // ★ GitHub Pages 기준 정확한 경로 (폴더 이름 영어로 되어 있어야 함)
-        model = await Live2DModel.from("models/changli/model3.json");
-
-        // 모델 크기 & 위치 조절
-        model.scale.set(0.45);
-        model.x = window.innerWidth * 0.25;
-        model.y = window.innerHeight * 0.8;
-
-        // 화면 중앙 정렬
-        model.anchor.set(0.5, 1);
-
-        app.stage.addChild(model);
-
-    } catch (e) {
-        console.error("Live2D 모델 로딩 실패:", e);
-    }
+    const model = await Live2DModel.from("models/model\\ changli/model3.json");
+    model.scale.set(0.4);
+    model.anchor.set(0.5, 1);
+    model.x = 300;
+    model.y = 750;
+    app.stage.addChild(model);
 })();
+
 
 // --------------------
 //  채팅 UI 기능
