@@ -1,15 +1,15 @@
 {
 	"Version": 3,
 	"FileReferences": {
-		"Moc": "长离.moc3",
+		"Moc": "moc3",
 		"Textures": [
-			"长离.4096/texture_00.png",
-			"长离.4096/texture_01.png",
-			"长离.4096/texture_02.png",
-			"长离.4096/texture_03.png"
+			"texture_00.png",
+			"texture_01.png",
+			"texture_02.png",
+			"texture_03.png"
 		],
-		"Physics": "长离.physics3.json",
-		"DisplayInfo": "长离.cdi3.json"
+		"Physics": "physics3.json",
+		"DisplayInfo": "cdi3.json"
 	},
 	"Groups": [
 		{

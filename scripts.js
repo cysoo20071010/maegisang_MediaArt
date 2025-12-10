@@ -1,44 +1,72 @@
+// PIXI + Live2D
+const { Live2DModel } = PIXI.live2d;
+
+// PIXI 앱 생성
 const app = new PIXI.Application({
     view: document.getElementById("live2dCanvas"),
     autoStart: true,
-    backgroundAlpha: 0
+    backgroundAlpha: 0,
+    resizeTo: window
 });
 
+let model;
+
+// Live2D 모델 로드
 (async () => {
-    // ★★ 가장 중요한 부분: 모델 경로 정확히 지정 ★★
-    const model = await PIXI.live2d.Live2DModel.from("models/长离.model3.json");
+    try {
+        // ★ GitHub Pages 기준 정확한 경로 (폴더 이름 영어로 되어 있어야 함)
+        model = await Live2DModel.from("models/changli/model3.json");
 
-    model.scale.set(0.5);
-    model.position.set(300, 600);
+        // 모델 크기 & 위치 조절
+        model.scale.set(0.45);
+        model.x = window.innerWidth * 0.25;
+        model.y = window.innerHeight * 0.8;
 
-    app.stage.addChild(model);
+        // 화면 중앙 정렬
+        model.anchor.set(0.5, 1);
 
-    // 채팅 기능
-    const chatLog = document.getElementById("chatLog");
-    const input = document.getElementById("userInput");
-    const sendBtn = document.getElementById("sendBtn");
+        app.stage.addChild(model);
 
-    const addMessage = (sender, message) => {
-        const div = document.createElement("div");
-        div.className = sender === "user" ? "msg-user" : "msg-bot";
-        div.innerText = message;
-        chatLog.appendChild(div);
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-    const sendMessage = async () => {
-        const text = input.value.trim();
-        if (!text) return;
-
-        addMessage("user", text);
-        input.value = "";
-
-        // 실제 AI 연결 대신 테스트용 응답
-        addMessage("bot", "아직 대답 기능 연결 전이야! 모델은 정상적으로 로드됨 ✓");
-    };
-
-    sendBtn.addEventListener("click", sendMessage);
-    input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendMessage();
-    });
+    } catch (e) {
+        console.error("Live2D 모델 로딩 실패:", e);
+    }
 })();
+
+// --------------------
+//  채팅 UI 기능
+// --------------------
+
+const chatLog = document.getElementById("chatLog");
+const input = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+
+function addMessage(type, text) {
+    const div = document.createElement("div");
+    div.className = type === "user" ? "msg-user" : "msg-bot";
+    div.innerText = text;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage("user", text);
+    input.value = "";
+
+    // ---------------------------
+    //  API 연동 전 임시 응답
+    // ---------------------------
+    addMessage("bot", "모델은 정상적으로 로드되었어요! ✓\nAI 연결은 아직이에요.");
+
+    // 이후 API 연결 시:
+    // const res = await fetch("https://YOUR-API/chat", ...)
+    // addMessage("bot", data.reply);
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});

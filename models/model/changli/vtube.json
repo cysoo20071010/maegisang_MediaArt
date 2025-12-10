@@ -4,7 +4,7 @@
     "ModelID": "e6ace315ae78432980e464293d449fa6",
     "FileReferences": {
         "Icon": "icon.png",
-        "Model": "长离.model3.json",
+        "Model": "model3.json",
         "IdleAnimation": "",
         "IdleAnimationWhenTrackingLost": ""
     },
