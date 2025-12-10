@@ -34,11 +34,12 @@ async function sendMessage() {
 
     addMessage(text, "user");
 
-    const res = await fetch("https://YOUR-BACKEND-DOMAIN/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-    });
+    const res = await fetch("https://maegisang-media-art.vercel.app/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+});
+
 
     const data = await res.json();
 
