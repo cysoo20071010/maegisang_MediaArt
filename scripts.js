@@ -1,25 +1,33 @@
+// PIXI + Live2D
 const { Live2DModel } = PIXI.live2d;
 
+// PIXI 앱 생성
 const app = new PIXI.Application({
     view: document.getElementById("live2dCanvas"),
     autoStart: true,
     backgroundAlpha: 0
 });
 
+let model;
+
 (async () => {
-    const model = await Live2DModel.from("models/model\\ changli/model3.json");
-    model.scale.set(0.4);
-    model.anchor.set(0.5, 1);
-    model.x = 300;
-    model.y = 750;
-    app.stage.addChild(model);
+    try {
+        // ★ GitHub / Vercel 기준 경로: models/model/changli/model3.json
+        model = await Live2DModel.from("models/model/changli/model3.json");
+
+        // 모델 크기/위치 조정
+        model.scale.set(0.4);
+        model.anchor.set(0.5, 1);
+        model.x = 300;
+        model.y = 750;
+
+        app.stage.addChild(model);
+    } catch (e) {
+        console.error("Live2D 모델 로딩 실패:", e);
+    }
 })();
 
-
-// --------------------
-//  채팅 UI 기능
-// --------------------
-
+// ----------------- 채팅 UI -----------------
 const chatLog = document.getElementById("chatLog");
 const input = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -39,18 +47,11 @@ async function sendMessage() {
     addMessage("user", text);
     input.value = "";
 
-    // ---------------------------
-    //  API 연동 전 임시 응답
-    // ---------------------------
-    addMessage("bot", "모델은 정상적으로 로드되었어요! ✓\nAI 연결은 아직이에요.");
-
-    // 이후 API 연결 시:
-    // const res = await fetch("https://YOUR-API/chat", ...)
-    // addMessage("bot", data.reply);
+    // 일단 테스트용 더미 응답
+    addMessage("bot", "라이브2D 모델이 잘 뜨는지 먼저 확인해보자! (AI 연결 전)");
 }
 
 sendBtn.addEventListener("click", sendMessage);
-
 input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
 });
